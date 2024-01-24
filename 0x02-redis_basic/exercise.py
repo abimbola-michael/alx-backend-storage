@@ -47,14 +47,15 @@ def replay(method: Callable) -> None:
         print("{}(*{}) -> {}".format(name, i.decode('utf-8'),
                                      o.decode('utf-8')))
 
+
 class Cache:
     """Redis cache class"""
-    
+
     def __init__(self):
         """Initiiates a Redis client"""
         self._redis = redis.Redis()
         self._redis.flushdb()
-    
+
     @count_calls
     @call_history
     def store(self, data: Union[str, bytes, int, float]) -> str:
@@ -62,18 +63,19 @@ class Cache:
         key = str(uuid4())
         self._redis.set(key, data)
         return key
-    
-    def get(self, key: str, fn: Optional[Callable] = None) -> Union[str, bytes, int, float, None]:
+
+    def get(self, key: str, fn: Optional[Callable] = None) ->
+    Union[str, bytes, int, float, None]:
         """Gets value from Redis using key"""
         data = self._redis.get(key)
         if not data:
             return None
         return fn(data) if fn else data
-    
+
     def get_str(self, key: str) -> str:
         """Converts bytes to str"""
         return self.get(key, lambda x: x.decode('utf-8'))
-    
+
     def get_int(self, key: str) -> int:
         """Converts bytes to int"""
         return self.get(key, int)
